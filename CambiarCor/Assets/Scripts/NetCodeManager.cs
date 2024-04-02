@@ -27,7 +27,10 @@ namespace NetCode
             {
                 StatusLabels();
 
-                SubmitNewColor();
+                if (NetworkManager.Singleton.IsClient) {
+
+                    SubmitNewColor();
+                }
             }
 
             GUILayout.EndArea();
@@ -52,14 +55,9 @@ namespace NetCode
 
         static void SubmitNewColor()
         {
-            if (GUILayout.Button(NetworkManager.Singleton.IsServer ? "Change Color" : "Request Color Change"))
+            if (GUILayout.Button(NetworkManager.Singleton.IsServer ? "" : "Request Color Change"))
             {
-                if (NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient )
-                {
-                    foreach (ulong uid in NetworkManager.Singleton.ConnectedClientsIds)
-                    NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(uid).GetComponent<NetCodePlayer>().ChangeColor();
-                }
-                else
+                if (NetworkManager.Singleton.IsClient )
                 {
                     var playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
                     var player = playerObject.GetComponent<NetCodePlayer>();

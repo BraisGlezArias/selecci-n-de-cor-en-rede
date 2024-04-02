@@ -1,5 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace NetCode
 {
@@ -7,6 +9,7 @@ namespace NetCode
     {
         public NetworkVariable<int> Color = new NetworkVariable<int>();
         public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
+        public List<int> materialsUsed = new List<int>();
 
         public override void OnNetworkSpawn()
         {
@@ -43,7 +46,17 @@ namespace NetCode
         void SubmitColorRequestServerRpc(RpcParams rpcParams = default)
         {
             int tamano = NetCodeManager.instance.materials.Count;
-            int rand = Random.Range(0, tamano);
+            bool used = true;
+            int rand = 0;
+            while (used) {
+                rand = Random.Range(0, tamano);
+                used = false;
+                foreach(int materialUsed in materialsUsed) {
+                    if (rand == materialUsed) {
+                        used = true;
+                    }
+                }
+            }
             var randomMaterial = NetCodeManager.instance.materials[rand];
             GetComponent<MeshRenderer>().materials[0].color = randomMaterial.color;
             Color.Value = rand;
