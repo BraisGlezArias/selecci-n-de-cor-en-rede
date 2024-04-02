@@ -45,6 +45,7 @@ namespace NetCode
         [Rpc(SendTo.Server)]
         void SubmitColorRequestServerRpc(RpcParams rpcParams = default)
         {
+            materialsUsed.Remove(Color.Value);
             int tamano = NetCodeManager.instance.materials.Count;
             bool used = true;
             int rand = 0;
