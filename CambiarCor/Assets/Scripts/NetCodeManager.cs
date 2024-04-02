@@ -10,6 +10,8 @@ namespace NetCode
         public List<Material> materials = new List<Material>();
         public static NetCodeManager instance;
 
+        private List<int> materialsUsed = new List<int>();
+
         void Awake() {
             instance = this;
         }
@@ -32,7 +34,7 @@ namespace NetCode
         }
 
         static void StartButtons()
-        {
+        {            
             if (GUILayout.Button("Host")) NetworkManager.Singleton.StartHost();
             if (GUILayout.Button("Client")) NetworkManager.Singleton.StartClient();
             if (GUILayout.Button("Server")) NetworkManager.Singleton.StartServer();
@@ -63,6 +65,22 @@ namespace NetCode
                     var player = playerObject.GetComponent<NetCodePlayer>();
                     player.ChangeColor();
                 }
+            }
+        }
+
+        void Update() {
+            if (NetworkManager.Singleton.IsServer) {
+                if (NetworkManager.Singleton.ConnectedClientsIds.Count > 6) {
+                    NetworkManager.Singleton.DisconnectClient(NetworkManager.Singleton.ConnectedClientsIds[NetworkManager.Singleton.ConnectedClientsIds.Count - 1]);
+                }
+
+                materialsUsed.Clear();
+                
+                foreach (ulong uid in NetworkManager.Singleton.ConnectedClientsIds)
+                    materialsUsed.Add(NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(uid).GetComponent<NetCodePlayer>().Color.Value);
+
+                foreach (ulong uid in NetworkManager.Singleton.ConnectedClientsIds)
+                    NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(uid).GetComponent<NetCodePlayer>().materialsUsed = materialsUsed;
             }
         }
     }
